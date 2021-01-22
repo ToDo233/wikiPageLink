@@ -15,7 +15,7 @@ This is a pure static web page , out of the box .
 ## Update
 	ver 0.1.1 - 2021-01-22
 	-------------------- 
-	  * add support for chinese keyWords . -FN:envCheck(keyWord)
+	  * feat support for chinese keyWords . -FN:envCheck(keyWord)
 	ver 0.1.0 - 2021-01-22
 	-------------------- 
 	  * remove impact checking function,it is immature . -FN:checkIntersects()
