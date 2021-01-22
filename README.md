@@ -1,12 +1,13 @@
 # WikiPageLink
 
-This is a simple Demo about showing the relationship between keywords on a wiki page .
+This is a simple Demo about showing the relationship between keywords on a wiki page .  
  [Quick Experience](https://todo233.github.io/wikiPageLink/) 
 
 ## Usage
 
-This is a pure static web page , out of the box .
+This is a pure static web page , out of the box .  
 	- You need an unrestricted network environment .
+	
 ![image](/gif/search.gif)
 ![image](/gif/extend&showDes.gif)
 ![image](/gif/extend2.gif)
@@ -14,6 +15,9 @@ This is a pure static web page , out of the box .
 
 ## Update
  
+	ver 0.1.2 - 2021-01-22
+	-------------------- 
+	  * optimization ErrorTip , fix sometimes ErrorTips could not disappears  . -FN:ErrorTip()
 	ver 0.1.1 - 2021-01-22
 	-------------------- 
 	  * feat support for chinese keyWords . -FN:envCheck(keyWord)
