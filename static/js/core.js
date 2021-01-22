@@ -6,33 +6,33 @@ const LINE_LENGTH = 105;
 const ROUND_ANGLE = 360;
 const CIRCLE_COLOR = '#e5e7eb';
 
-var base_url =
+let base_url =
 	'https://en.wikipedia.org/';
-var api_url =
+let api_url =
 	'w/api.php?format=json&origin=*&action=parse&prop=text&section=0&redirects=1&page=';
 const corss_api_url =
 	'https://cors-anywhere.sssc.workers.dev/?';
-var suggest_url =
+let suggest_url =
 	'w/api.php?action=opensearch&format=json&formatversion=2&namespace=0&limit=4&search=';
 
-var canvas = null;
+let canvas = null;
 // 判断动作是移动还是点击
-var isMoved = false;
+let isMoved = false;
 // 深度，也许后续会用上
-var deep = 0;
+let deep = 0;
 // 存储遍历的root节点
-var pathTree = [];
+let pathTree = [];
 // 初始节点坐标
-var rootStart = {
+let rootStart = {
 	x: 250,
 	y: 175
 };
 // 保存节点关键字
-var nodeKey = [];
-var isPanning = false;
+let nodeKey = [];
+let isPanning = false;
 // 用于切换wiki中英文站点的标识，默认值为'en' 
-var env = 'en';
-var redirectCount = 0;
+let env = 'en';
+let redirectCount = 0;
 // Init fabric_canvas
 (function() {
 	canvas = this.__canvas = new fabric.Canvas('c', {
@@ -47,8 +47,6 @@ var redirectCount = 0;
 	};
 })();
 
-window.canvas = canvas;
-window.zoom = window.zoom ? window.zoom : 1;
 
 /**
  * 获取canvas 中心点的坐标
@@ -75,7 +73,7 @@ function getCenterCoord() {
  */
 
 function makeCircle(left, top, line, root, keyWord, isRoot) {
-	var c = new fabric.Circle({
+	let c = new fabric.Circle({
 		left: left,
 		top: top,
 		strokeWidth: 2,
@@ -98,15 +96,7 @@ function makeCircle(left, top, line, root, keyWord, isRoot) {
  * @returns {object} 绘制连线对象
  */
 function makeLine(coords) {
-	// var line = new fabric.Line(coords, {
-	//      fill: '#666',
-	//      stroke: '#666',
-	//      strokeWidth: 1.1,
-	//      selectable: false,
-	//      evented: false,
-	//   type: 'line,
-	//    });
-	var line = new fabric.Path('M 65 0 Q 100, 100, 200, 0', {
+	let line = new fabric.Path('M 65 0 Q 100, 100, 200, 0', {
 		fill: '',
 		stroke: '#666',
 		strokeWidth: 1.1,
@@ -146,7 +136,7 @@ function makeText(str, left, top, fontSize) {
 
 //监听鼠标按下动作,还原isMoved 为 false
 canvas.on('mouse:down', function(e) {
-	//var p = e.target;
+	//let p = e.target;
 	isMoved = false;
 	//按住alt键拖动画布
 	// if(event.altKey) {
@@ -164,7 +154,7 @@ canvas.on('mouse:up', function(e) {
 	isPanning = false;
 	if (e.target && e.target.type != 'line') {
 		console.log(e.target)
-		var p = e.target._objects[0];
+		let p = e.target._objects[0];
 		if (p && p.keyWord && !p.isRoot && !isMoved) {
 			p.isRoot = true;
 			//p.set('radius', 20);
@@ -181,7 +171,7 @@ canvas.on('mouse:up', function(e) {
 canvas.on('mouse:move', function(e) {
 	if (isPanning && event) {
 		console.log(canvas.getObjects().filter(item => item.type === 'line'))
-		var delta = new fabric.Point(event.movementX, event.movementY);
+		let delta = new fabric.Point(event.movementX, event.movementY);
 		canvas.relativePan(delta);
 	}
 });
@@ -197,9 +187,9 @@ canvas.on('object:moved', function(e) {
  * 初始节点的路径,并将节点加入 pathTree 
  */
 canvas.on('mouse:over', function(e) {
-	var p = e.target;
+	let p = e.target;
 	if (p && p.type != 'line' && p._objects) {
-		var root = p._objects[0];
+		let root = p._objects[0];
 		getDes(root.keyWord);
 		BOX.style.display = 'inline-block';
 		BOX.innerHTML = 'Loading ...';
@@ -243,18 +233,18 @@ canvas.on('mouse:out', function(e) {
  * canvas对象移动事件
  */
 canvas.on('object:moving', function(e) {
-	var p = e.target._objects[0];
+	let p = e.target._objects[0];
 	if (p.line) {
 		p.line.path[1][3] = e.target.left + p.left;
 		p.line.path[1][4] = e.target.top + p.top;
 	}
 	if (p.isRoot) {
 		//获取所有root节点关键字一致的节点
-		var pf = canvas.getObjects().filter(item => item._objects && item._objects[0].root && item._objects[0].root.keyWord ===
+		let pf = canvas.getObjects().filter(item => item._objects && item._objects[0].root && item._objects[0].root.keyWord ===
 			p.keyWord);
 		pf.forEach(function(ele, i) {
 			if (ele._objects[0].line) {
-				var line = ele._objects[0].line;
+				let line = ele._objects[0].line;
 				line.path[0][1] = e.target.left + p.left;
 				line.path[0][2] = e.target.top + p.top;
 			}
@@ -264,30 +254,14 @@ canvas.on('object:moving', function(e) {
 });
 
 canvas.on("mouse:wheel", function(e) {
-	var zoom = (event.deltaY > 0 ? -0.1 : 0.1) + canvas.getZoom();
+	let zoom = (event.deltaY > 0 ? -0.1 : 0.1) + canvas.getZoom();
 	setZoom(event, zoom);
 });
-
-
-// function checkIntersects(){
-// 	var o = canvas.getObjects().filter(item => item.type === 'node' );
-// 	for(var i = 0;i<o.length;i++){
-// 		var o1 = o[i];
-// 		var j = Math.min(i+1,o.length-1);
-// 		var o2 = o[j];
-// 		if(o1.intersectsWithObject(o2)){
-// 			console.log(o1)
-// 			o1.top = o2.top+25;
-// 			o1._objects[0].line.path[1][4] = o1._objects[0].line.path[1][2] = o1.top+o1._objects[0].top;
-// 			console.log(o1)
-// 		}
-// 	}
-// }
 
 function setZoom(event, zoom) {
 	zoom = Math.max(0.3, zoom);
 	zoom = Math.min(1.1, zoom);
-	var point = new fabric.Point(canvas.width / 2, canvas.height / 2);
+	let point = new fabric.Point(canvas.width / 2, canvas.height / 2);
 	canvas.zoomToPoint(point, zoom);
 }
 
@@ -301,7 +275,7 @@ function getDes(keyWord) {
 	Ajax.get(base_url + 'api/rest_v1/page/summary/' + keyWord,
 		null,
 		function(res) {
-			var htmlObj = JSON.parse(res);
+			let htmlObj = JSON.parse(res);
 			BOX.innerHTML = htmlObj.extract_html;
 		}
 	);
@@ -315,14 +289,14 @@ function getDes(keyWord) {
  * @returns {{x:x,y:y}}} 子节点坐标
  */
 function getBisectingPoints(pos, count) {
-	var points = [];
+	let points = [];
 	//计算平分角
-	var angle = Math.round(ROUND_ANGLE / (count));
-	var radians = (Math.PI / 180) * angle;
+	let angle = Math.round(ROUND_ANGLE / (count));
+	let radians = (Math.PI / 180) * angle;
 	//如果子节点数量大于15则延长线宽为原1.5倍
-	//var r = count < 8 ? LINE_LENGTH : LINE_LENGTH * 1.5;
-	for (var i = 0; i < count; i++) {
-		var r = LINE_LENGTH;
+	//let r = count < 8 ? LINE_LENGTH : LINE_LENGTH * 1.5;
+	for (let i = 0; i < count; i++) {
+		let r = LINE_LENGTH;
 		if (count < 6) {
 			r = LINE_LENGTH * 0.5;
 		}
@@ -330,8 +304,8 @@ function getBisectingPoints(pos, count) {
 			r = LINE_LENGTH * 1.5;
 		}
 
-		var x = pos.x + r * Math.sin(radians * i);
-		var y = pos.y + r * Math.cos(radians * i);
+		let x = pos.x + r * Math.sin(radians * i);
+		let y = pos.y + r * Math.cos(radians * i);
 		points.unshift({
 			x: x,
 			y: y
@@ -377,9 +351,9 @@ function ErrorTip(errorInfo){
  */
 function getwikipediaContent(keyWord, start, root) {
 	envCheck(keyWord);
-	var url = base_url + api_url + keyWord.toLowerCase();
-	var start = start ? start : rootStart;
-	var root = root ? root : null;
+	let url = base_url + api_url + keyWord.toLowerCase();
+	start = start ? start : rootStart;
+	root = root ? root : null;
 	// 如果root为null则是查询了新的关键词，清空上一次查询的数据
 	if (!root) {
 		canvas._objects = [];
@@ -388,7 +362,7 @@ function getwikipediaContent(keyWord, start, root) {
 	}
 	LOADING.style.zIndex = 99;
 	Ajax.get(url, LOADING, function(res) {
-		var contentObj = JSON.parse(res);
+		let contentObj = JSON.parse(res);
 		// wiki返回了错误信息，显示信息
 		// 可能是页面不存在
 		if (contentObj.error) {
@@ -405,7 +379,7 @@ function getwikipediaContent(keyWord, start, root) {
 		// 将redirects 里的to作为新的关键词重新请求 
 		// 修复了无限 redirects导致的死循环 --！
 		if (contentObj.parse.redirects.length > 0) {
-			var to = contentObj.parse.redirects[0].to;
+			let to = contentObj.parse.redirects[0].to;
 			if (to != contentObj.parse.redirects[0].from && redirectCount < 2) {
 				redirectCount++;
 				console.log('the page redirect to ' + to);
@@ -417,32 +391,32 @@ function getwikipediaContent(keyWord, start, root) {
 		// wiki返回了查询结果的dom，可以使用正则表达式提取或者加载dom
 		// 然后通过js dom解析结果，这里选择的是dom操作，创建一个div然后
 		// 将返回的dom  innerHtml 
-		var objE = document.createElement('div');
+		let objE = document.createElement('div');
 		objE.className = 'temp';
 		// 去除转义符
 		objE.innerHTML = JSON.stringify(contentObj.parse.text).replace(/\\"/g, '');
-		var domList = objE.childNodes[1].querySelectorAll('p');
-		var keyList = [];
-		var k = [];
+		let domList = objE.childNodes[1].querySelectorAll('p');
+		let keyList = [];
+		let k = [];
 		outer:
-			for (var domCount = 0; domCount < domList.length; domCount++) {
-				var domEle = domList[domCount];
-				var c = domEle.childNodes;
-				for (var i = 0; i < c.length; i++) {
-					var childNode = c[i];
+			for (let domCount = 0; domCount < domList.length; domCount++) {
+				let domEle = domList[domCount];
+				let c = domEle.childNodes;
+				for (let i = 0; i < c.length; i++) {
+					let childNode = c[i];
 					if (childNode.nodeName === 'B') {
 						keyList = domEle.querySelectorAll('a');
 						keyList.forEach(function(keyEle) {
-							var hrefVal = keyEle.attributes[0].nodeValue;
+							let hrefVal = keyEle.attributes[0].nodeValue;
 							//中文结果需要转码
 							if (env === 'zh') {
 								hrefVal = decodeURIComponent(hrefVal);
 							}
 							if (hrefVal.indexOf('wiki/') > -1 && hrefVal.indexOf(':') < 0) {
-								var dhrefVal = hrefVal.split('/');
+								let dhrefVal = hrefVal.split('/');
 								//去重
 								if (k.indexOf(dhrefVal[2]) < 0) {
-									var ck = dhrefVal[2];
+									let ck = dhrefVal[2];
 									if (env === 'en') {
 										ck = dhrefVal[2].toUpperCase();
 									}
@@ -471,10 +445,10 @@ function getwikipediaContent(keyWord, start, root) {
  */
 function test(rootStart, keyWord, k, root) {
 
-	var count = k.length;
+	let count = k.length;
 	//最多添加10个节点
 	count = Math.min(10, count);
-	var points = getBisectingPoints(rootStart, count);
+	let points = getBisectingPoints(rootStart, count);
 	//添加root节点
 	if (root === null) {
 		if (env === 'en') {
@@ -483,8 +457,8 @@ function test(rootStart, keyWord, k, root) {
 			nodeKey.push(keyWord);
 		}
 		root = makeCircle(rootStart.x, rootStart.y, null, null, keyWord, true);
-		var itext = makeText(keyWord, rootStart.x, rootStart.y + 35, 17);
-		var group = new fabric.Group([root, itext], {});
+		let itext = makeText(keyWord, rootStart.x, rootStart.y + 35, 17);
+		let group = new fabric.Group([root, itext], {});
 		group.hasControls = group.hasBorders = false;
 		group.type = 'node';
 		canvas.add(
@@ -492,18 +466,18 @@ function test(rootStart, keyWord, k, root) {
 		);
 	}
 	//添加子节点
-	for (var i = 0; i < count; i++) {
-		var key = k[i].replace(/_/g, ' ');
-		var ck = key;
+	for (let i = 0; i < count; i++) {
+		let key = k[i].replace(/_/g, ' ');
+		let ck = key;
 		if (env === 'en') {
 			ck = key.toUpperCase();
 		}
 		//if (nodeKey.indexOf(ck) < 0) {
 		nodeKey.push(ck);
-		var line = makeLine([rootStart.x, rootStart.y, points[i].x, points[i].y]);
-		var de = points[i].y > root.top + root.group.top ? 25 : -25;
-		var itext = makeText(key, points[i].x, points[i].y + de, 13);
-		var group = new fabric.Group([makeCircle(points[i].x, points[i].y, line, root, key, false), itext], {});
+		let line = makeLine([rootStart.x, rootStart.y, points[i].x, points[i].y]);
+		let de = points[i].y > root.top + root.group.top ? 25 : -25;
+		let itext = makeText(key, points[i].x, points[i].y + de, 13);
+		let group = new fabric.Group([makeCircle(points[i].x, points[i].y, line, root, key, false), itext], {});
 		group.hasControls = group.hasBorders = false;
 		group.type = 'node';
 		canvas.add(
