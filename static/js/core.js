@@ -1,7 +1,7 @@
 const ERROR = document.querySelector('.inner');
 const LOADING = document.querySelector('.loader');
 const BOX = document.querySelector('.box');
-// 默认线长
+// 默认线长，对应canvans对象的属性是obj.width
 const LINE_LENGTH = 105;
 const ROUND_ANGLE = 360;
 const CIRCLE_COLOR = '#e5e7eb';
@@ -361,6 +361,14 @@ function envCheck(keyWord) {
 	console.log(env)
 }
 
+function ErrorTip(errorInfo){
+	ERROR.style.zIndex = 99;
+	ERROR.innerHTML = 'ERROR:' + errorInfo;
+	setTimeout(function(){	
+		ERROR.style.zIndex = 0;
+	},2000);
+}
+
 /**
  * 获取wiki资料
  * @param {Object} keyWord 关键字
@@ -384,10 +392,15 @@ function getwikipediaContent(keyWord, start, root) {
 		// wiki返回了错误信息，显示信息
 		// 可能是页面不存在
 		if (contentObj.error) {
-			ERROR.style.zIndex = 99;
-			ERROR.innerHTML = 'ERROR:' + contentObj.error.info;
+			ErrorTip(contentObj.error.info);
+			// ERROR.style.zIndex = 99;
+			// ERROR.innerHTML = 'ERROR:' + contentObj.error.info;
+			// setTimeout(function(){	
+			// 	ERROR.style.zIndex = 0;
+			// },2000);
 			return;
 		}
+
 		// wiki针对关键词返回了可能的转发信息'redirects'，
 		// 将redirects 里的to作为新的关键词重新请求 
 		// 修复了无限 redirects导致的死循环 --！
