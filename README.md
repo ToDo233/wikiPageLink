@@ -1,7 +1,7 @@
 # WikiPageLink
 
 This is a simple Demo about showing the relationship between keywords on a wiki page .
-
+ [Quick Experience](https://todo233.github.io/wikiPageLink/) 
 
 ## Usage
 
@@ -13,14 +13,16 @@ This is a pure static web page , out of the box .
 ![image](/gif/chinese_support.gif)
 
 ## Update
+ 
 	ver 0.1.1 - 2021-01-22
 	-------------------- 
-	  * add support for chinese keyWords . -FN:envCheck(keyWord)
+	  * feat support for chinese keyWords . -FN:envCheck(keyWord)
 	ver 0.1.0 - 2021-01-22
 	-------------------- 
 	  * remove impact checking function,it is immature . -FN:checkIntersects()
 
 ## Thanks
+ 
 	[Fabric.js](https://github.com/fabricjs/fabric.js) is a powerful and simple Javascript HTML5 canvas library . 
 	
 ## License
